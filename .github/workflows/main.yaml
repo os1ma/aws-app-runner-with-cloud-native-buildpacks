@@ -10,15 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: asdf-vm/actions/install@v1
+
     - uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ap-northeast-1
+
     - uses: aws-actions/amazon-ecr-login@v1
       id: login-ecr
+
+    - uses: asdf-vm/actions/setup@v1
+
     - run: |
+        asdf plugin-add buildpack
+        asdf install
         pack build $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --builder paketobuildpacks/builder:base
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       env:
